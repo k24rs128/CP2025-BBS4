@@ -111,8 +111,20 @@ function validateAuthInput(email, password, isRegister = false) {
     return true;
 }
 
+  //改良
+let lastPostTime = 0;
+
 // 投稿処理
 function createPost(author, content) {
+
+    // 改良10秒のクールタイム
+    const now = Date.now();
+    if (now - lastPostTime < 10000) {
+        showMessage('少し待ってから投稿してください', 'error');
+        return;
+    }
+    lastPostTime = now;
+
     if (!currentUser) {
         showMessage('投稿するにはログインが必要です', 'error');
         return;
