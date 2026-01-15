@@ -137,7 +137,9 @@ function createPost(author, content) {
 
     // author はログインしているユーザのメールアドレスに変更、userId を追加
     const postData = {
-        author: currentUser.email,
+        //author: currentUser.email,
+        //改良
+        author: currentUser.displayName || '匿名',
         content: content,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         userId: currentUser.uid
@@ -460,6 +462,16 @@ function register(email, password) {
     button.prop('disabled', true);
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
+
+    .then((result) => {
+    // 改良displayName を設定
+        const name = $('#displayName').val() || '匿名';
+
+        return result.user.updateProfile({
+            displayName: name
+        });
+    })
+
     .then(() => {
         showMessage('アカウントを作成しました');
         clearAuthForm();
@@ -495,7 +507,9 @@ function updateUI(user) {
     if (user) {
         $('.logged-in').show();
         $('.logged-out').hide();
-        $('#userEmail').text(user.email);
+        //改良displayNameを表示
+        $('#userEmail').text(user.displayName || user.email);
+        //$('#userEmail').text(user.email);
         //$('#userEmail').text(user.uid);
     } else {
         $('.logged-in').hide();
@@ -583,6 +597,14 @@ window.addEventListener('unload', () => {
                        class="form-control" placeholder="6文字以上">
                 <small class="help-text">※新規登録時は6文字以上</small>
             </div>
+            
+            <div class="form-group">
+            <label for="displayName">ニックネーム</label>
+            <input type="text" id="displayName"
+                class="form-control"
+                placeholder="表示名（例：たろう）">
+            </div>
+
             <div class="button-group">
                 <button id="loginButton" class="btn-primary">ログイン</button>
                 <button id="registerButton" class="btn-secondary">新規登録</button>
